@@ -93,14 +93,25 @@ class GoRouterDelegate extends RouterDelegate<RouteMatchList>
   }
 
   NavigatorState? _findCurrentNavigator() {
-    NavigatorState? state;
-    if (navigatorKey.currentState?.canPop() ?? false) {
-      state = navigatorKey.currentState;
-    }
+    //  NavigatorState? state;
+
+    /// I set state to [navigatorKey.currentState]
+    NavigatorState? state = navigatorKey.currentState;
+
+    /// The if condition below is always falsy when the Android back button is pressed.
+    /// Because of that it returns null and [GoRouterDelegate.popRoute] returns false.
+
+    // if (navigatorKey.currentState?.canPop() ?? false) {
+    //   state = navigatorKey.currentState;
+    // }
+
     RouteMatchBase walker = currentConfiguration.matches.last;
     while (walker is ShellRouteMatch) {
-      final NavigatorState potentialCandidate =
-          walker.navigatorKey.currentState!;
+      final NavigatorState? potentialCandidate =
+          walker.navigatorKey.currentState;
+      if (potentialCandidate == null) {
+        break;
+      }
       if (!ModalRoute.of(potentialCandidate.context)!.isCurrent) {
         // There is a pageless route on top of the shell route. it needs to be
         // popped first.
